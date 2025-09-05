@@ -15,20 +15,34 @@ const StoreContextProvider = (props) => {
 
     const [food_list, setFoodList] = useState([]);
 
-    const addToCart = (itemId) => {
+    const addToCart = async (itemId) => {
         if (!cartItems[itemId]) {
             setCartItems((prev) => ({ ...prev, [itemId]: 1 }))
         }
         else {
             setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] + 1 }))
         }
+
+        if (token) {
+            await axios.post(url+"/api/cart/add", {itemId}, {headers:{token}});
+        }
     }
 
 
-    const removeFromCart = (itemId) => {
-        setCartItems((prev) => ({ ...prev, [itemId]: prev[itemId] - 1 }))
+const removeFromCart = async (itemId) => {
+    if (!cartItems[itemId]) return;
 
+    const newCart = { ...cartItems };
+    newCart[itemId] -= 1;
+    if (newCart[itemId] === 0) delete newCart[itemId];
+    setCartItems(newCart);
+
+    if (token) {
+        const response = await axios.post(url + "/api/cart/remove", { itemId }, { headers: { token } });
+        if (response.data.cartData) setCartItems(response.data.cartData);
     }
+};
+
 
     const getTotalCartAmount = () => {
         let totalAmout = 0;
@@ -48,9 +62,27 @@ const StoreContextProvider = (props) => {
 
     }
 
+const loadCartData = async (token) => {
+    try {
+        const response = await axios.get(url + "/api/cart/get", { headers: { token } });
+        if (response.data.success) {
+            setCartItems(response.data.cartData);
+        } else {
+            setCartItems({});
+        }
+    } catch (err) {
+        console.error("Failed to load cart data:", err);
+        setCartItems({});
+    }
+};
+
     useEffect(()=>{
         async function loadData(){
             await fetchFoodList();
+            if(localStorage.getItem("token")){
+                setToken(localStorage.getItem("token"));
+                await loadCartData(localStorage.getItem("token"));
+            }
         }
         loadData();
     }, [])
@@ -65,7 +97,8 @@ const StoreContextProvider = (props) => {
         getTotalCartAmount, 
         url, 
         token, 
-        setToken
+        setToken, 
+        loadCartData
     }
 
     return (

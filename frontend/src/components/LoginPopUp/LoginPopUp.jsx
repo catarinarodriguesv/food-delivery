@@ -6,7 +6,7 @@ import axios from "axios"
 
 const LoginPopUp = ({ setShowLogin }) => {
 
-  const { url, setToken } = useContext(StoreContext);
+  const { url, setToken, loadCartData } = useContext(StoreContext);
 
   const [currState, setCurrState] = useState("Login");
   const [data, setData] = useState({
@@ -38,6 +38,7 @@ const LoginPopUp = ({ setShowLogin }) => {
       setToken(response.data.token);
       localStorage.setItem("token", response.data.token);
       setShowLogin(false);
+      loadCartData(response.data.token);
 
     } else {
       alert(response.data.message);
