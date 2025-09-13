@@ -16,15 +16,4 @@ const authMiddleware = async (req, res, next) => {
     }
 };
 
-// admin access only, should be done with user roles tho @TODO
-// const adminMiddleware = (req, res, next) => {
-//     console.log(req);
-//   if (req.user && req.user.email === process.env.ADMIN_EMAIL) {
-//     console.log(req);
-//     next();
-//   } else {
-//     res.status(403).json({ success: false, message: "Admin access required" });
-//   }
-// };
-
 export {authMiddleware};

@@ -21,15 +21,17 @@ const loginUser = async (req, res)=>{
             return res.json({success:false,message:"Invalid credentials"});
         }
 
+        const role=user.role;
         const token = createToken(user._id);
 
-        res.json({success:true, token});
+        res.json({success:true, token, role});
 
     } catch (error) {
         console.log(error);
         res.json({success:false, message:"Error"});
     }
 }
+
 
 const createToken = (id)=>{
     return jwt.sign({id}, process.env.JWT_SECRET);
@@ -72,8 +74,8 @@ const registerUser = async (req, res)=>{
 
         //generate token
         const token = createToken(user._id);
-
-        res.json({success:true, token});
+        const role=user.role;
+        res.json({success:true, token, role});
 
     } catch (error) {
         console.log(error);

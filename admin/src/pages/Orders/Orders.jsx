@@ -10,13 +10,12 @@ import { assets } from "../../assets/assets"
 const Orders = ({url}) => {
 
   const [orders, setOrders] = useState([]);
+  const token = localStorage.getItem("token"); 
 
   const fetchAllOrders = async ()=>{
-    const response = await axios.get(url+"/api/order/list");
-    console.log(response.data);
+    const response = await axios.get(url+"/api/order/list", {headers: {token}});
     if (response.data.success) {
       setOrders(response.data.data);
-      console.log(response.data.data);
     } else {
       toast.error("Error");
     }
@@ -26,7 +25,9 @@ const Orders = ({url}) => {
     const response = await axios.post(url+"/api/order/status", {
       orderId,
       status:event.target.value
-    });
+    }, {
+    headers: { token }
+  });
     if (response.data.success) {
       await fetchAllOrders();
     }
